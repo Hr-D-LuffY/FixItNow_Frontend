@@ -15,14 +15,16 @@ export interface ApiEnvelope<T> {
 	data: T | null;
 }
 
-export interface Paginated<T, Key extends string> {
+export type Paginated<T, Key extends string> = {
 	pagination: {
 		total: number;
 		page: number;
 		limit: number;
 		totalPages: number;
 	};
-}
+} & {
+	[K in Key]: T[];
+};
 
 export class ApiError extends Error {
 	status: number;
