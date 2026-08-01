@@ -32,6 +32,10 @@ export type Service = {
 	updatedAt: string;
 };
 
+export type ServiceDetailData = {
+	service: Service;
+};
+
 export type ServicesListData = Paginated<Service, "services">;
 
 // Assumed unpaginated — confirm against a real /categories response
