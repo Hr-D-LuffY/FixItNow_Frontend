@@ -1,27 +1,109 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+	/* Core surfaces */
+	--color-paper: #ffffff;
+	--color-surface: #f2f4f7;
+	--color-surface-hover: #e8ebf0;
+	--color-border: #dde1e7;
+
+	/* Ink (text) */
+	--color-ink: #12151b;
+	--color-ink-muted: #5b6470;
+	--color-ink-faint: #8a93a1;
+
+	/* Brand */
+	--color-primary: #1e3a5f; /* deep navy — trust, professionalism */
+	--color-primary-hover: #16293f;
+	--color-dispatch: #ff6a1f; /* the one warm accent — CTAs only */
+	--color-dispatch-hover: #e6591a;
+
+	/* Booking status — used consistently for every status badge in the app */
+	--color-status-requested: #b9770e; /* amber */
+	--color-status-requested-bg: #fdf1de;
+	--color-status-accepted: #2e6fe0; /* blue */
+	--color-status-accepted-bg: #eaf1fd;
+	--color-status-declined: #c23b3b; /* red */
+	--color-status-declined-bg: #fbeaea;
+	--color-status-cancelled: #7a3b3b; /* muted maroon */
+	--color-status-cancelled-bg: #f4ecec;
+	--color-status-completed: #2e9e5b; /* green */
+	--color-status-completed-bg: #eaf7ef;
+
+	/* Payment status */
+	--color-payment-pending: #b9770e;
+	--color-payment-pending-bg: #fdf1de;
+	--color-payment-succeeded: #2e9e5b;
+	--color-payment-succeeded-bg: #eaf7ef;
+	--color-payment-failed: #c23b3b;
+	--color-payment-failed-bg: #fbeaea;
+
+	--radius-sm: 0.375rem;
+	--radius-md: 0.625rem;
+	--radius-lg: 1rem;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-    sans-serif;
-  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-}
+	--color-paper: var(--color-paper);
+	--color-surface: var(--color-surface);
+	--color-surface-hover: var(--color-surface-hover);
+	--color-border: var(--color-border);
+	--color-ink: var(--color-ink);
+	--color-ink-muted: var(--color-ink-muted);
+	--color-ink-faint: var(--color-ink-faint);
+	--color-primary: var(--color-primary);
+	--color-primary-hover: var(--color-primary-hover);
+	--color-dispatch: var(--color-dispatch);
+	--color-dispatch-hover: var(--color-dispatch-hover);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+	--color-status-requested: var(--color-status-requested);
+	--color-status-requested-bg: var(--color-status-requested-bg);
+	--color-status-accepted: var(--color-status-accepted);
+	--color-status-accepted-bg: var(--color-status-accepted-bg);
+	--color-status-declined: var(--color-status-declined);
+	--color-status-declined-bg: var(--color-status-declined-bg);
+	--color-status-cancelled: var(--color-status-cancelled);
+	--color-status-cancelled-bg: var(--color-status-cancelled-bg);
+	--color-status-completed: var(--color-status-completed);
+	--color-status-completed-bg: var(--color-status-completed-bg);
+
+	--color-payment-pending: var(--color-payment-pending);
+	--color-payment-pending-bg: var(--color-payment-pending-bg);
+	--color-payment-succeeded: var(--color-payment-succeeded);
+	--color-payment-succeeded-bg: var(--color-payment-succeeded-bg);
+	--color-payment-failed: var(--color-payment-failed);
+	--color-payment-failed-bg: var(--color-payment-failed-bg);
+
+	--font-sans:
+		ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+	--font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+	background: var(--color-paper);
+	color: var(--color-ink);
+	font-family: var(--font-sans);
+}
+
+/* Signature motif: a dashed "tear line" — echoes a service ticket / receipt
+   perforation. Used as a section divider (footer top edge, ticket-style
+   summaries) instead of a plain hairline rule. */
+.ticket-divider {
+	border-top: 1.5px dashed var(--color-border);
+}
+
+/* Visible keyboard focus, kept consistent across all interactive elements */
+:focus-visible {
+	outline: 2px solid var(--color-dispatch);
+	outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
 }
