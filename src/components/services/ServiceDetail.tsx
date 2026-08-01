@@ -1,13 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { api } from "@/lib/api";
-import type { Service, ServiceDetailData } from "@/types/services";
+import { useAuthStore } from "@/store/auth-store";
+import { BookingForm } from "@/components/bookings/BookingForm";
+import type { ServiceDetailData } from "@/types/services";
 
 export function ServiceDetail({ serviceId }: { serviceId: string }) {
+	const [showBookingForm, setShowBookingForm] = useState(false);
+	const { user, isAuthenticated, isHydrating } = useAuthStore();
+
 	const serviceQuery = useQuery({
 		queryKey: ["service", serviceId],
 		queryFn: () => api.get<ServiceDetailData>(`/services/${serviceId}`),
@@ -76,17 +81,29 @@ export function ServiceDetail({ serviceId }: { serviceId: string }) {
 						{service.description}
 					</p>
 
-					<button
-						type="button"
-						onClick={() =>
-							toast.info(
-								"Booking flow is landing in the next commit — this button will open the request form.",
-							)
-						}
-						className="mt-2 inline-flex w-fit items-center justify-center rounded-md bg-dispatch px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-90"
-					>
-						Book Now
-					</button>
+					{isHydrating ?
+						<div className="mt-2 h-12 w-36 animate-pulse rounded-md bg-surface" />
+					: !isAuthenticated ?
+						<Link
+							href={`/auth/login?from=/services/${serviceId}`}
+							className="mt-2 inline-flex w-fit items-center justify-center rounded-md border border-primary px-6 py-3 text-sm font-semibold text-primary transition hover:bg-primary/5"
+						>
+							Sign in to book this service
+						</Link>
+					: user?.role !== "CUSTOMER" ?
+						<p className="mt-2 text-sm text-ink/60">
+							Only customer accounts can book services.
+						</p>
+					: showBookingForm ?
+						<BookingForm serviceId={service.id} />
+					:	<button
+							type="button"
+							onClick={() => setShowBookingForm(true)}
+							className="mt-2 inline-flex w-fit items-center justify-center rounded-md bg-dispatch px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-90"
+						>
+							Book Now
+						</button>
+					}
 				</div>
 			</div>
 
