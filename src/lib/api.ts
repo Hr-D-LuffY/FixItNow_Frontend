@@ -4,7 +4,6 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export const TOKEN_COOKIE = "fixitnow_token";
 
 if (!API_URL) {
-	// Fail loudly in dev rather than silently hitting a relative path.
 	console.warn(
 		"NEXT_PUBLIC_API_URL is not set — check your .env.local against .env.example",
 	);
@@ -36,8 +35,8 @@ export class ApiError extends Error {
 }
 
 interface RequestOptions extends Omit<RequestInit, "body"> {
-	body?: unknown; // pass a plain object; we JSON.stringify it
-	skipAuth?: boolean; // for public endpoints — don't attach the token
+	body?: unknown;
+	skipAuth?: boolean;
 }
 
 export async function apiFetch<T>(
@@ -103,7 +102,6 @@ export async function apiFetch<T>(
 	return (envelope?.data as T) ?? (undefined as T);
 }
 
-// Convenience helpers — thin wrappers over apiFetch for common verbs.
 export const api = {
 	get: <T>(path: string, options?: RequestOptions) =>
 		apiFetch<T>(path, { ...options, method: "GET" }),
