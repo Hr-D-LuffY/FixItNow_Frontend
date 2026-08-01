@@ -29,3 +29,5 @@ export type BookingsListData = Paginated<Booking, "bookings">;
 export type BookingResponseData = {
 	booking: Booking;
 };
+
+export type BookingDetailData = BookingResponseData;
