@@ -1,118 +1,128 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Logo from "./Logo";
+import { useAuthStore } from "@/store/auth-store";
 
-const NAV_LINKS = [{ href: "/services", label: "Browse services" }];
+const DASHBOARD_PATH: Record<string, string> = {
+	CUSTOMER: "/dashboard/customer",
+	TECHNICIAN: "/dashboard/technician",
+	ADMIN: "/dashboard/admin",
+};
 
 export default function Navbar() {
-	const [open, setOpen] = useState(false);
+	const router = useRouter();
+	const [mobileOpen, setMobileOpen] = useState(false);
+
+	const user = useAuthStore((state) => state.user);
+	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+	const isHydrating = useAuthStore((state) => state.isHydrating);
+	const logout = useAuthStore((state) => state.logout);
+
+	const handleLogout = () => {
+		logout();
+		setMobileOpen(false);
+		router.push("/");
+	};
 
 	return (
-		<header className="sticky top-0 z-40 border-b border-border bg-paper/95 backdrop-blur supports-[backdrop-filter]:bg-paper/80">
-			<div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-				<Logo />
+		<header className="border-b border-ink/10 bg-paper">
+			<nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+				<Logo className="flex items-center gap-2" />
 
-				{/* Desktop nav */}
-				<nav className="hidden items-center gap-8 md:flex">
-					{NAV_LINKS.map((link) => (
-						<Link
-							key={link.href}
-							href={link.href}
-							className="text-sm font-medium text-ink-muted transition-colors hover:text-ink"
-						>
-							{link.label}
-						</Link>
-					))}
-				</nav>
-
-				<div className="hidden items-center gap-3 md:flex">
-					<Link
-						href="/auth/login"
-						className="text-sm font-medium text-ink-muted transition-colors hover:text-ink"
-					>
-						Log in
-					</Link>
-					<Link
-						href="/auth/register"
-						className="rounded-full bg-dispatch px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-dispatch-hover"
-					>
-						Get started
-					</Link>
+				{/* Desktop auth section — swap in your existing nav links here */}
+				<div className="hidden items-center gap-4 md:flex">
+					{isHydrating ?
+						// Skeleton to avoid a flash of logged-out UI while
+						// AuthHydrator's /auth/me call resolves.
+						<div className="h-8 w-24 animate-pulse rounded-md bg-surface" />
+					: isAuthenticated && user ?
+						<>
+							<Link
+								href={DASHBOARD_PATH[user.role] ?? "/"}
+								className="text-sm font-medium text-ink hover:text-primary"
+							>
+								{user?.name?.split(" ")[0] ?? "Your"}&apos;s Dashboard
+							</Link>
+							<button
+								onClick={handleLogout}
+								className="rounded-md border border-ink/15 px-3 py-1.5 text-sm font-medium text-ink hover:border-primary/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-dispatch"
+							>
+								Log out
+							</button>
+						</>
+					:	<>
+							<Link
+								href="/auth/login"
+								className="text-sm font-medium text-ink hover:text-primary"
+							>
+								Log in
+							</Link>
+							<Link
+								href="/auth/register"
+								className="rounded-md bg-dispatch px-3 py-1.5 text-sm font-medium text-paper hover:opacity-90"
+							>
+								Register
+							</Link>
+						</>
+					}
 				</div>
 
-				{/* Mobile menu toggle */}
+				{/* Mobile menu toggle — keep your existing button, just make
+            sure aria-expanded/aria-controls still point at the panel */}
 				<button
 					type="button"
-					onClick={() => setOpen((v) => !v)}
-					className="inline-flex h-10 w-10 items-center justify-center rounded-md text-ink md:hidden"
-					aria-expanded={open}
-					aria-controls="mobile-nav"
-					aria-label={open ? "Close menu" : "Open menu"}
+					aria-expanded={mobileOpen}
+					aria-controls="mobile-menu"
+					aria-label="Toggle menu"
+					onClick={() => setMobileOpen((v) => !v)}
+					className="md:hidden"
 				>
-					<svg
-						width="22"
-						height="22"
-						viewBox="0 0 22 22"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-						aria-hidden="true"
-					>
-						{open ?
-							<path
-								d="M5 5L17 17M17 5L5 17"
-								stroke="currentColor"
-								strokeWidth="1.75"
-								strokeLinecap="round"
-							/>
-						:	<path
-								d="M3 6H19M3 11H19M3 16H19"
-								stroke="currentColor"
-								strokeWidth="1.75"
-								strokeLinecap="round"
-							/>
-						}
-					</svg>
+					{/* your existing hamburger icon */}
 				</button>
-			</div>
+			</nav>
 
-			{/* Mobile nav panel */}
-			{open && (
-				<nav
-					id="mobile-nav"
-					className="border-t border-border bg-paper px-4 pb-4 md:hidden"
-				>
-					<ul className="flex flex-col gap-1 pt-2">
-						{NAV_LINKS.map((link) => (
-							<li key={link.href}>
+			{/* Mobile panel */}
+			{mobileOpen && (
+				<div id="mobile-menu" className="ticket-divider border-t md:hidden">
+					<div className="flex flex-col gap-3 px-4 py-4">
+						{isAuthenticated && user ?
+							<>
 								<Link
-									href={link.href}
-									onClick={() => setOpen(false)}
-									className="block rounded-md px-2 py-2.5 text-sm font-medium text-ink-muted hover:bg-surface hover:text-ink"
+									href={DASHBOARD_PATH[user.role] ?? "/"}
+									onClick={() => setMobileOpen(false)}
+									className="text-sm font-medium text-ink"
 								>
-									{link.label}
+									{user.name.split(" ")[0]}&apos;s Dashboard
 								</Link>
-							</li>
-						))}
-					</ul>
-					<div className="ticket-divider mt-3 flex flex-col gap-2 pt-3">
-						<Link
-							href="/auth/login"
-							onClick={() => setOpen(false)}
-							className="rounded-md px-2 py-2.5 text-center text-sm font-medium text-ink-muted hover:bg-surface hover:text-ink"
-						>
-							Log in
-						</Link>
-						<Link
-							href="/auth/register"
-							onClick={() => setOpen(false)}
-							className="rounded-full bg-dispatch px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-dispatch-hover"
-						>
-							Get started
-						</Link>
+								<button
+									onClick={handleLogout}
+									className="text-left text-sm font-medium text-ink"
+								>
+									Log out
+								</button>
+							</>
+						:	<>
+								<Link
+									href="/auth/login"
+									onClick={() => setMobileOpen(false)}
+									className="text-sm font-medium text-ink"
+								>
+									Log in
+								</Link>
+								<Link
+									href="/auth/register"
+									onClick={() => setMobileOpen(false)}
+									className="text-sm font-medium text-ink"
+								>
+									Register
+								</Link>
+							</>
+						}
 					</div>
-				</nav>
+				</div>
 			)}
 		</header>
 	);
