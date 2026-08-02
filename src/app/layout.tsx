@@ -9,7 +9,6 @@ export const metadata: Metadata = {
 	description:
 		"Book qualified home service technicians for plumbing, electrical, cleaning, and more.",
 };
-
 export default function RootLayout({
 	children,
 }: Readonly<{
