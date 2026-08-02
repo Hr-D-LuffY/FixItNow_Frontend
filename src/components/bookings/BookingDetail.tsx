@@ -6,7 +6,11 @@ import { api } from "@/lib/api";
 import { StatusBadge } from "./StatusBadge";
 import { CancelBookingButton } from "./CancelBookingButton";
 import { ReviewForm } from "./ReviewForm";
-import type { BookingDetailData } from "@/types/bookings";
+import { PayButton } from "@/components/bookings/PayButton";
+import type { BookingDetailData , BookingStatus } from "@/types/bookings";
+
+
+const PAYABLE_STATUSES: BookingStatus[] = ["ACCEPTED", "COMPLETED"];
 
 export function BookingDetail({ bookingId }: { bookingId: string }) {
 	const bookingQuery = useQuery({
@@ -79,6 +83,10 @@ export function BookingDetail({ bookingId }: { bookingId: string }) {
 					</div>
 				)}
 
+				<p className="mt-4 text-xs text-ink/40">
+					Requested {new Date(booking.createdAt).toLocaleString()}
+				</p>
+				
 				<p className="font-mono text-xs text-ink/50">
 					Requested{" "}
 					{new Date(booking.createdAt).toLocaleDateString(undefined, {
