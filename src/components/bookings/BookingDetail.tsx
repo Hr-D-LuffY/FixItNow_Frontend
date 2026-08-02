@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import { StatusBadge } from "./StatusBadge";
-import { CancelBookingButton } from "./CancelBookingButton";
-import { ReviewForm } from "./ReviewForm";
+import { StatusBadge } from "@/components/bookings/StatusBadge";
+import { CancelBookingButton } from "@/components/bookings/CancelBookingButton";
+import { ReviewForm } from "@/components/bookings/ReviewForm";
 import { PayButton } from "@/components/bookings/PayButton";
-import type { BookingDetailData , BookingStatus } from "@/types/bookings";
+import type { BookingDetailData, BookingStatus } from "@/types/bookings";
 
-
+// Not documented anywhere (same posture as decision 25's cancel gating) —
+// sensible-default UI gating only, backend is the real enforcement point.
 const PAYABLE_STATUSES: BookingStatus[] = ["ACCEPTED", "COMPLETED"];
 
 export function BookingDetail({ bookingId }: { bookingId: string }) {
@@ -24,7 +25,7 @@ export function BookingDetail({ bookingId }: { bookingId: string }) {
 
 	if (bookingQuery.isError || !bookingQuery.data) {
 		return (
-			<main className="mx-auto max-w-2xl px-4 py-12">
+			<main className="mx-auto max-w-3xl px-4 py-12">
 				<p className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
 					{bookingQuery.error instanceof Error ?
 						bookingQuery.error.message
@@ -35,7 +36,7 @@ export function BookingDetail({ bookingId }: { bookingId: string }) {
 					href="/dashboard/customer"
 					className="mt-4 inline-block text-sm font-medium text-primary hover:underline"
 				>
-					← Back to my bookings
+					← Back to your bookings
 				</Link>
 			</main>
 		);
@@ -45,18 +46,18 @@ export function BookingDetail({ bookingId }: { bookingId: string }) {
 	const service = booking.service;
 
 	return (
-		<main className="mx-auto max-w-2xl px-4 py-12">
+		<main className="mx-auto max-w-3xl px-4 py-12">
 			<Link
 				href="/dashboard/customer"
 				className="mb-6 inline-block text-sm font-medium text-primary hover:underline"
 			>
-				← Back to my bookings
+				← Back to your bookings
 			</Link>
 
-			<div className="ticket-divider flex flex-col gap-4 pt-6">
+			<div className="rounded-lg border border-ink/10 bg-surface p-6">
 				<div className="flex items-start justify-between gap-4">
 					<div>
-						<h1 className="text-2xl font-bold text-ink">
+						<h1 className="text-xl font-bold text-ink">
 							{service?.title ?? "Service details unavailable"}
 						</h1>
 						{service?.technician?.user?.name && (
@@ -69,59 +70,43 @@ export function BookingDetail({ bookingId }: { bookingId: string }) {
 				</div>
 
 				{service?.price != null && (
-					<p className="font-mono text-xl font-semibold text-ink">
+					<p className="mt-4 font-mono text-lg font-semibold text-ink">
 						${service.price.toFixed(2)}
 					</p>
 				)}
 
 				{booking.notes && (
-					<div className="rounded-lg border border-ink/10 bg-surface p-4">
-						<p className="text-xs font-medium uppercase tracking-wide text-ink/50">
-							Your notes
-						</p>
-						<p className="mt-1 text-sm text-ink/80">{booking.notes}</p>
-					</div>
+					<p className="mt-4 text-sm leading-relaxed text-ink/70">
+						<span className="font-medium text-ink">Notes: </span>
+						{booking.notes}
+					</p>
 				)}
 
 				<p className="mt-4 text-xs text-ink/40">
 					Requested {new Date(booking.createdAt).toLocaleString()}
 				</p>
-				
-				<p className="font-mono text-xs text-ink/50">
-					Requested{" "}
-					{new Date(booking.createdAt).toLocaleDateString(undefined, {
-						year: "numeric",
-						month: "short",
-						day: "numeric",
-					})}
-				</p>
 
-				<div className="mt-2 flex flex-wrap gap-3">
+				<div className="ticket-divider mt-6 flex flex-wrap items-center gap-3 pt-6">
+					{PAYABLE_STATUSES.includes(booking.status) && (
+						<PayButton bookingId={booking.id} />
+					)}
 					<CancelBookingButton booking={booking} />
 				</div>
-
-				{booking.status === "COMPLETED" && (
-					<div className="mt-4">
-						<h2 className="mb-3 text-base font-bold text-ink">
-							Leave a review
-						</h2>
-						<ReviewForm bookingId={booking.id} />
-					</div>
-				)}
 			</div>
+
+			{booking.status === "COMPLETED" && (
+				<section className="mt-8">
+					<ReviewForm bookingId={booking.id} />
+				</section>
+			)}
 		</main>
 	);
 }
 
 function BookingDetailSkeleton() {
 	return (
-		<main className="mx-auto max-w-2xl px-4 py-12">
-			<div className="flex flex-col gap-4">
-				<div className="h-4 w-32 animate-pulse rounded bg-surface" />
-				<div className="h-8 w-2/3 animate-pulse rounded bg-surface" />
-				<div className="h-6 w-24 animate-pulse rounded bg-surface" />
-				<div className="h-20 w-full animate-pulse rounded bg-surface" />
-			</div>
+		<main className="mx-auto max-w-3xl px-4 py-12">
+			<div className="h-96 w-full animate-pulse rounded-lg bg-surface" />
 		</main>
 	);
 }
