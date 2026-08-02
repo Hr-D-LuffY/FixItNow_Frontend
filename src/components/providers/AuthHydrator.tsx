@@ -20,9 +20,9 @@ export function AuthHydrator() {
 		}
 
 		api
-			.get<AuthUser>("/auth/me")
-			.then((user) => {
-				setUser(user);
+			.get<{ user: AuthUser }>("/auth/me")
+			.then((response) => {
+				setUser(response.user);
 			})
 			.catch((error: ApiError) => {
 				if (error.status === 401) {
