@@ -32,13 +32,26 @@ export type Service = {
 	updatedAt: string;
 };
 
-export type ServiceDetailData = {
-	service: Service;
-};
-
 export type ServicesListData = Paginated<Service, "services">;
 
 // Assumed unpaginated — confirm against a real /categories response
 export type CategoriesListData = {
 	categories: Category[];
+};
+
+export type ServiceDetailData = {
+	service: Service;
+};
+
+export type CreateServiceInput = {
+	categoryId: string;
+	title: string;
+	description: string;
+	price: number;
+};
+
+export type UpdateServiceInput = Partial<CreateServiceInput>;
+
+export type ServiceResponseData = {
+	service: Service;
 };

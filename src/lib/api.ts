@@ -13,6 +13,7 @@ export interface ApiEnvelope<T> {
 	success: boolean;
 	message: string;
 	data: T | null;
+	errorDetails?: Record<string, string[]>;
 }
 
 export type Paginated<T, Key extends string> = {
@@ -28,11 +29,17 @@ export type Paginated<T, Key extends string> = {
 
 export class ApiError extends Error {
 	status: number;
+	errorDetails?: Record<string, string[]>;
 
-	constructor(message: string, status: number) {
+	constructor(
+		message: string,
+		status: number,
+		errorDetails?: Record<string, string[]>,
+	) {
 		super(message);
 		this.name = "ApiError";
 		this.status = status;
+		this.errorDetails = errorDetails;
 	}
 }
 
@@ -98,6 +105,7 @@ export async function apiFetch<T>(
 		throw new ApiError(
 			envelope?.message ?? `Request failed with status ${response.status}`,
 			response.status,
+			envelope?.errorDetails,
 		);
 	}
 
