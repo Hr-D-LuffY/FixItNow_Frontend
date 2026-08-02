@@ -31,3 +31,9 @@ export type BookingResponseData = {
 };
 
 export type BookingDetailData = BookingResponseData;
+
+export type UpdateBookingStatusInput = {
+	status: Extract<BookingStatus, "ACCEPTED" | "DECLINED" | "COMPLETED">;
+};
+
+export type BookingStatusResponseData = BookingResponseData;
