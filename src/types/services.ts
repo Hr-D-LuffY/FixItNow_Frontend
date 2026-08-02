@@ -27,7 +27,7 @@ export type Service = {
 	categoryId: string;
 	category: Category;
 	technician: Technician;
-	imageUrl?: string | null;
+	imageUrl?: string | null; 
 	createdAt: string;
 	updatedAt: string;
 };
@@ -54,4 +54,15 @@ export type UpdateServiceInput = Partial<CreateServiceInput>;
 
 export type ServiceResponseData = {
 	service: Service;
+};
+
+export type CreateCategoryInput = {
+	name: string;
+	description?: string;
+};
+
+export type UpdateCategoryInput = Partial<CreateCategoryInput>;
+
+export type CategoryResponseData = {
+	category: Category;
 };
