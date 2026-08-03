@@ -148,7 +148,7 @@ fixitnow-frontend/
 
 | Link                                   | URL                                              |
 | -------------------------------------- | ------------------------------------------------ |
-| **Live app**                           | <!-- TODO: add deployed frontend URL -->         |
+| **Live app**                           | `https://fixitnow-hr.vercel.app/`        		|
 | **Backend API**                        | `https://fixitnow-backend-d2kr.onrender.com/api` |
 | **API reference (Postman collection)** | `docs/FixItNow_API_postman_collection.json`      |
 
