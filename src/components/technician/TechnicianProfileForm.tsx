@@ -9,8 +9,7 @@ import { api, ApiError } from "@/lib/api";
 import { useAuthStore } from "@/store/auth-store";
 import {
 	technicianProfileSchema,
-	type TechnicianProfileFormInput,
-	type TechnicianProfileFormOutput,
+	type TechnicianProfileFormInput as TechnicianProfileFormValues,
 } from "@/lib/validations/technician";
 import type {
 	SaveTechnicianProfileInput,
@@ -20,6 +19,7 @@ import type {
 export function TechnicianProfileForm() {
 	const { user, isAuthenticated, isHydrating } = useAuthStore();
 	const queryClient = useQueryClient();
+
 	const profileQuery = useQuery({
 		queryKey: ["technician-profile"],
 		queryFn: () =>
@@ -36,7 +36,7 @@ export function TechnicianProfileForm() {
 		profileQuery.error instanceof ApiError &&
 		profileQuery.error.status === 404;
 
-	const profile = profileQuery.data?.technician;
+	const profile = profileQuery.data?.profile;
 
 	const {
 		register,
@@ -45,19 +45,16 @@ export function TechnicianProfileForm() {
 		setValue,
 		reset,
 		formState: { errors },
-	} = useForm<TechnicianProfileFormInput, unknown, TechnicianProfileFormOutput>(
-		{
-			resolver: zodResolver(technicianProfileSchema),
-			defaultValues: {
-				bio: "",
-				skills: "",
-				experienceYears: undefined,
-				availability: true,
-			},
+	} = useForm<TechnicianProfileFormValues>({
+		resolver: zodResolver(technicianProfileSchema),
+		defaultValues: {
+			bio: "",
+			skills: "",
+			experienceYears: undefined,
+			availability: true,
 		},
-	);
+	});
 
-	// Prefill once the real profile loads (no-op while it's still 404/loading).
 	useEffect(() => {
 		if (profile) {
 			reset({
@@ -72,15 +69,23 @@ export function TechnicianProfileForm() {
 	const availability = watch("availability");
 
 	const saveMutation = useMutation({
-		mutationFn: (values: TechnicianProfileFormOutput) => {
+		mutationFn: (values: TechnicianProfileFormValues) => {
+			const experienceYears =
+				(
+					values.experienceYears === undefined ||
+					values.experienceYears === ("" as unknown)
+				) ?
+					undefined
+				:	Number(values.experienceYears);
+
 			const body: SaveTechnicianProfileInput = {
 				bio: values.bio || undefined,
 				skills:
 					values.skills
 						?.split(",")
-						.map((skill) => skill.trim())
+						.map((skill: string) => skill.trim())
 						.filter(Boolean) ?? [],
-				experienceYears: values.experienceYears,
+				experienceYears,
 				availability: values.availability,
 			};
 

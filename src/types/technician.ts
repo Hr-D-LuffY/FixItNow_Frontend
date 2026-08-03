@@ -5,6 +5,8 @@ export type TechnicianProfile = {
 	skills: string[];
 	experienceYears: number | null;
 	availability: boolean;
+	createdAt: string;
+	updatedAt: string;
 };
 
 export type SaveTechnicianProfileInput = {
@@ -15,5 +17,5 @@ export type SaveTechnicianProfileInput = {
 };
 
 export type TechnicianProfileResponseData = {
-	technician: TechnicianProfile;
+	profile: TechnicianProfile;
 };

@@ -1,10 +1,13 @@
 import type { Paginated } from "@/lib/api";
+import type { TechnicianProfile } from "./technician";
 
 export type BookingStatus =
 	| "REQUESTED"
 	| "ACCEPTED"
 	| "DECLINED"
 	| "CANCELLED"
+	| "PAID"
+	| "IN_PROGRESS"
 	| "COMPLETED";
 
 export type BookingService = {
@@ -24,28 +27,19 @@ export type BookingCustomer = {
 	email: string;
 };
 
-export type BookingTechnician = {
-	id: string;
-	userId: string;
-	bio: string | null;
-	experienceYears: number | null;
-	skills: string[];
-	availability: boolean;
-};
-
 export type Booking = {
 	id: string;
-	customerId: string;
-	technicianId: string;
 	serviceId: string;
-	status: BookingStatus;
+	technicianId: string;
+	customerId: string;
 	price: number;
 	notes: string | null;
+	status: BookingStatus;
 	createdAt: string;
 	updatedAt: string;
 	service?: BookingService;
 	customer?: BookingCustomer;
-	technician?: BookingTechnician;
+	technician?: TechnicianProfile;
 };
 
 export type CreateBookingInput = {
@@ -60,3 +54,12 @@ export type BookingResponseData = {
 };
 
 export type BookingDetailData = BookingResponseData;
+
+export type UpdateBookingStatusInput = {
+	status: Extract<
+		BookingStatus,
+		"ACCEPTED" | "DECLINED" | "IN_PROGRESS" | "COMPLETED"
+	>;
+};
+
+export type BookingStatusResponseData = BookingResponseData;

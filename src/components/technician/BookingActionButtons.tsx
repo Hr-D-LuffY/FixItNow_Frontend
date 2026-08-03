@@ -23,6 +23,7 @@ export function BookingActionButtons({ booking }: { booking: Booking }) {
 			toast.success(
 				status === "ACCEPTED" ? "Booking accepted"
 				: status === "DECLINED" ? "Booking declined"
+				: status === "IN_PROGRESS" ? "Job started"
 				: "Booking marked complete",
 			);
 			queryClient.invalidateQueries({ queryKey: ["technician-bookings"] });
@@ -82,6 +83,27 @@ export function BookingActionButtons({ booking }: { booking: Booking }) {
 	}
 
 	if (booking.status === "ACCEPTED") {
+		return (
+			<p className="text-sm text-ink/60">
+				Waiting on customer payment before this job can start.
+			</p>
+		);
+	}
+
+	if (booking.status === "PAID") {
+		return (
+			<button
+				type="button"
+				onClick={() => statusMutation.mutate("IN_PROGRESS")}
+				disabled={statusMutation.isPending}
+				className="inline-flex items-center justify-center rounded-md bg-dispatch px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 disabled:opacity-60"
+			>
+				{statusMutation.isPending ? "Starting..." : "Start job"}
+			</button>
+		);
+	}
+
+	if (booking.status === "IN_PROGRESS") {
 		return (
 			<button
 				type="button"

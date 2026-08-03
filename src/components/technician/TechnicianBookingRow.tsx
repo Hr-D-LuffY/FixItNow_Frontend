@@ -10,10 +10,10 @@ export function TechnicianBookingRow({ booking }: { booking: Booking }) {
 					<h3 className="text-base font-semibold text-ink">
 						{booking.service?.title ?? "Service request"}
 					</h3>
-					{/* No nested customer field on Booking — see commit note */}
 					<p className="font-mono text-xs text-ink/50">
-						Booking #{booking.id.slice(0, 8)} · Customer #
-						{booking.customerId.slice(0, 8)}
+						Booking #{booking.id.slice(0, 8)} ·{" "}
+						{booking.customer?.name ??
+							`Customer #${booking.customerId.slice(0, 8)}`}
 					</p>
 				</div>
 				<StatusBadge status={booking.status} />
