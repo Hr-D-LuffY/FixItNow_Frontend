@@ -6,16 +6,48 @@ import { usePathname, useRouter } from "next/navigation";
 import Logo from "./Logo";
 import { useAuthStore } from "@/store/auth-store";
 
-const DASHBOARD_PATH: Record<string, string> = {
+type NavLink = { href: string; label: string };
+type Role = "CUSTOMER" | "TECHNICIAN" | "ADMIN";
+
+const DASHBOARD_PATH: Record<Role, string> = {
 	CUSTOMER: "/dashboard/customer",
 	TECHNICIAN: "/dashboard/technician",
 	ADMIN: "/dashboard/admin",
 };
 
-const NAV_LINKS = [
+const GUEST_LINKS: NavLink[] = [
 	{ href: "/", label: "Home" },
 	{ href: "/services", label: "Browse services" },
 ];
+
+// One link set per role. Links are derived from the authenticated user's
+// role instead of a single static array that never changed regardless of
+// who was logged in.
+const ROLE_LINKS: Record<Role, NavLink[]> = {
+	CUSTOMER: [
+		{ href: "/", label: "Home" },
+		{ href: "/services", label: "Browse services" },
+		{ href: "/dashboard/customer", label: "My bookings" },
+		{ href: "/dashboard/customer/payments", label: "Payments" },
+	],
+	TECHNICIAN: [
+		{ href: "/dashboard/technician", label: "Overview" },
+		{ href: "/dashboard/technician/bookings", label: "Booking requests" },
+		{ href: "/dashboard/technician/services", label: "My services" },
+		{ href: "/dashboard/technician/profile", label: "Profile" },
+	],
+	ADMIN: [
+		{ href: "/dashboard/admin", label: "Overview" },
+		{ href: "/dashboard/admin/users", label: "Users" },
+		{ href: "/dashboard/admin/bookings", label: "Bookings" },
+		{ href: "/dashboard/admin/categories", label: "Categories" },
+	],
+};
+
+function getNavLinks(role?: Role): NavLink[] {
+	if (!role) return GUEST_LINKS;
+	return ROLE_LINKS[role];
+}
 
 export default function Navbar() {
 	const pathname = usePathname();
@@ -26,6 +58,9 @@ export default function Navbar() {
 	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 	const isHydrating = useAuthStore((state) => state.isHydrating);
 	const logout = useAuthStore((state) => state.logout);
+
+	const role = isAuthenticated ? (user?.role as Role | undefined) : undefined;
+	const navLinks = getNavLinks(role);
 
 	const handleLogout = () => {
 		logout();
@@ -41,9 +76,9 @@ export default function Navbar() {
 			<nav className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-3">
 				<Logo className="flex items-center gap-2" />
 
-				{/* Primary nav links — desktop */}
+				{/* Primary nav links — desktop. Role-specific once authenticated. */}
 				<div className="hidden flex-1 items-center gap-6 md:flex">
-					{NAV_LINKS.map((link) => (
+					{navLinks.map((link) => (
 						<Link
 							key={link.href}
 							href={link.href}
@@ -65,11 +100,14 @@ export default function Navbar() {
 					: isAuthenticated && user ?
 						<>
 							<Link
-								href={DASHBOARD_PATH[user.role] ?? "/"}
+								href={DASHBOARD_PATH[user.role as Role] ?? "/"}
 								className="text-sm font-medium text-ink hover:text-primary"
 							>
-								{user?.name?.split(" ")[0] ?? "Your"}&apos;s Dashboard
+								Hi, {user.name.split(" ")[0]}
 							</Link>
+							<span className="rounded-full bg-surface px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-ink-muted">
+								{user.role.toLowerCase()}
+							</span>
 							<button
 								onClick={handleLogout}
 								className="rounded-md border border-ink/15 px-3 py-1.5 text-sm font-medium text-ink hover:border-primary/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-dispatch"
@@ -129,11 +167,22 @@ export default function Navbar() {
 				</button>
 			</nav>
 
-			{/* Mobile panel */}
+			{/* Mobile panel — same role-derived link set */}
 			{mobileOpen && (
 				<div id="mobile-menu" className="ticket-divider border-t md:hidden">
 					<div className="flex flex-col gap-3 px-4 py-4">
-						{NAV_LINKS.map((link) => (
+						{isAuthenticated && user && (
+							<div className="flex items-center gap-2 pb-1">
+								<span className="text-sm font-semibold text-ink">
+									Hi, {user.name.split(" ")[0]}
+								</span>
+								<span className="rounded-full bg-surface px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
+									{user.role.toLowerCase()}
+								</span>
+							</div>
+						)}
+
+						{navLinks.map((link) => (
 							<Link
 								key={link.href}
 								href={link.href}
@@ -149,13 +198,6 @@ export default function Navbar() {
 						<div className="ticket-divider pt-3">
 							{isAuthenticated && user ?
 								<div className="flex flex-col gap-3 pt-3">
-									<Link
-										href={DASHBOARD_PATH[user.role] ?? "/"}
-										onClick={() => setMobileOpen(false)}
-										className="text-sm font-medium text-ink"
-									>
-										{user.name.split(" ")[0]}&apos;s Dashboard
-									</Link>
 									<button
 										onClick={handleLogout}
 										className="text-left text-sm font-medium text-ink"
