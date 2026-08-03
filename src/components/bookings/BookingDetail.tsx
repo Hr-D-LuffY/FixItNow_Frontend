@@ -11,7 +11,7 @@ import type { BookingDetailData, BookingStatus } from "@/types/bookings";
 
 // Not documented anywhere (same posture as decision 25's cancel gating) —
 // sensible-default UI gating only, backend is the real enforcement point.
-const PAYABLE_STATUSES: BookingStatus[] = ["ACCEPTED", "COMPLETED"];
+const PAYABLE_STATUSES: BookingStatus[] = ["ACCEPTED"];
 
 export function BookingDetail({ bookingId }: { bookingId: string }) {
 	const bookingQuery = useQuery({

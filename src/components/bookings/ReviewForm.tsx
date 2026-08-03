@@ -11,13 +11,15 @@ import {
 	type CreateReviewFormValues,
 } from "@/lib/validations/review";
 import type { ReviewResponseData } from "@/types/reviews";
+import {
+	isBookingReviewed,
+	markBookingReviewed,
+} from "@/lib/reviewed-bookings";
 
 export function ReviewForm({ bookingId }: { bookingId: string }) {
-	// No GET /reviews endpoint exists (decision 5), so there's no way to ask
-	// the backend "was this already reviewed" — this flag only survives for
-	// the current page view. On refresh, a booking that already has a review
-	// will show the form again. Documented limitation, not a bug.
-	const [submitted, setSubmitted] = useState(false);
+	const [submitted, setSubmitted] = useState(() =>
+		isBookingReviewed(bookingId),
+	);
 
 	const {
 		control,
@@ -38,6 +40,7 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
 			}),
 		onSuccess: () => {
 			toast.success("Thanks for your review!");
+			markBookingReviewed(bookingId);
 			setSubmitted(true);
 		},
 		onError: (error) => {

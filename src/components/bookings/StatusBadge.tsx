@@ -11,13 +11,13 @@ const STATUS_LABEL: Record<BookingStatus, string> = {
 };
 
 const STATUS_CLASS: Record<BookingStatus, string> = {
-	REQUESTED: "bg-status-requested-bg text-status-requested",
-	ACCEPTED: "bg-status-accepted-bg text-status-accepted",
-	DECLINED: "bg-status-declined-bg text-status-declined",
-	CANCELLED: "bg-status-cancelled-bg text-status-cancelled",
-	PAID: "bg-blue-100 text-blue-700", // stopgap — no --color-status-paid token yet
-	IN_PROGRESS: "bg-amber-100 text-amber-700", // stopgap — no --color-status-in-progress token yet
-	COMPLETED: "bg-status-completed-bg text-status-completed",
+	REQUESTED: "bg-status-requested-bg text-status-requested", // Yellow/Orange
+	ACCEPTED: "bg-status-accepted-bg text-status-accepted", // Blue
+	DECLINED: "bg-status-declined-bg text-status-declined", // Red
+	CANCELLED: "bg-status-cancelled-bg text-status-cancelled", // Dark Red
+	PAID: "bg-purple-100 text-purple-700", // stopgap — no --color-status-paid token yet; Purple per spec
+	IN_PROGRESS: "bg-green-100 text-green-700", // stopgap — no --color-status-in-progress token yet; Green per spec
+	COMPLETED: "bg-status-completed-bg text-status-completed", // Gray
 };
 
 export function StatusBadge({ status }: { status: BookingStatus }) {
