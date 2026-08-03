@@ -57,23 +57,16 @@ export function BookingDetail({ bookingId }: { bookingId: string }) {
 			<div className="rounded-lg border border-ink/10 bg-surface p-6">
 				<div className="flex items-start justify-between gap-4">
 					<div>
-						<h1 className="text-xl font-bold text-ink">
+						<h1 className="text-2xl font-bold text-ink">
 							{service?.title ?? "Service details unavailable"}
 						</h1>
-						{service?.technician?.user?.name && (
-							<p className="mt-1 text-sm text-ink/60">
-								with {service.technician.user.name}
-							</p>
-						)}
 					</div>
 					<StatusBadge status={booking.status} />
 				</div>
 
-				{service?.price != null && (
-					<p className="mt-4 font-mono text-lg font-semibold text-ink">
-						${service.price.toFixed(2)}
-					</p>
-				)}
+				<p className="font-mono text-xl font-semibold text-ink">
+					${booking.price.toFixed(2)}
+				</p>
 
 				{booking.notes && (
 					<p className="mt-4 text-sm leading-relaxed text-ink/70">

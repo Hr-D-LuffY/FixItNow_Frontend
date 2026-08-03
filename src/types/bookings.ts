@@ -1,5 +1,4 @@
 import type { Paginated } from "@/lib/api";
-import type { Service } from "./services";
 
 export type BookingStatus =
 	| "REQUESTED"
@@ -8,15 +7,45 @@ export type BookingStatus =
 	| "CANCELLED"
 	| "COMPLETED";
 
-export type Booking = {
+export type BookingService = {
 	id: string;
-	serviceId: string;
-	service?: Service;
-	customerId: string;
-	notes: string | null;
-	status: BookingStatus;
+	categoryId: string;
+	technicianId: string;
+	title: string;
+	description: string;
+	price: number;
 	createdAt: string;
 	updatedAt: string;
+};
+
+export type BookingCustomer = {
+	id: string;
+	name: string;
+	email: string;
+};
+
+export type BookingTechnician = {
+	id: string;
+	userId: string;
+	bio: string | null;
+	experienceYears: number | null;
+	skills: string[];
+	availability: boolean;
+};
+
+export type Booking = {
+	id: string;
+	customerId: string;
+	technicianId: string;
+	serviceId: string;
+	status: BookingStatus;
+	price: number;
+	notes: string | null;
+	createdAt: string;
+	updatedAt: string;
+	service?: BookingService;
+	customer?: BookingCustomer;
+	technician?: BookingTechnician;
 };
 
 export type CreateBookingInput = {
@@ -31,9 +60,3 @@ export type BookingResponseData = {
 };
 
 export type BookingDetailData = BookingResponseData;
-
-export type UpdateBookingStatusInput = {
-	status: Extract<BookingStatus, "ACCEPTED" | "DECLINED" | "COMPLETED">;
-};
-
-export type BookingStatusResponseData = BookingResponseData;

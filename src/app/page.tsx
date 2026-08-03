@@ -13,13 +13,7 @@ export default function HomePage() {
 		queryFn: () => apiFetch<ServicesListData>("/services?page=1&limit=6"),
 	});
 
-	const categoriesQuery = useQuery({
-		queryKey: ["categories"],
-		queryFn: () => apiFetch<CategoriesListData>("/categories"),
-	});
-
 	const services = servicesQuery.data?.services ?? [];
-	const categories = categoriesQuery.data?.categories ?? [];
 
 	return (
 		<main className="mx-auto max-w-6xl px-4 py-12">
@@ -38,19 +32,6 @@ export default function HomePage() {
 					Browse all services
 				</Link>
 			</section>
-
-			{categories.length > 0 && (
-				<section className="mb-10 flex flex-wrap justify-center gap-2">
-					{categories.map((category) => (
-						<span
-							key={category.id}
-							className="rounded-full border border-ink/10 bg-surface px-3 py-1 text-xs font-medium text-ink/70"
-						>
-							{category.name}
-						</span>
-					))}
-				</section>
-			)}
 
 			<section>
 				<div className="mb-6 flex items-center justify-between">
