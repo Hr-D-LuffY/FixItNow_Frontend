@@ -94,9 +94,14 @@ export async function apiFetch<T>(
 	}
 
 	if (response.status === 401) {
-		Cookies.remove(TOKEN_COOKIE);
-		if (typeof window !== "undefined") {
-			window.location.href = "/auth/login";
+		if (!skipAuth) {
+			Cookies.remove(TOKEN_COOKIE);
+			if (
+				typeof window !== "undefined" &&
+				window.location.pathname !== "/auth/login"
+			) {
+				window.location.href = "/auth/login";
+			}
 		}
 		throw new ApiError(envelope?.message ?? "Session expired.", 401);
 	}

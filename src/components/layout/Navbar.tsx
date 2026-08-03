@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Logo from "./Logo";
 import { useAuthStore } from "@/store/auth-store";
 
@@ -12,7 +12,13 @@ const DASHBOARD_PATH: Record<string, string> = {
 	ADMIN: "/dashboard/admin",
 };
 
+const NAV_LINKS = [
+	{ href: "/", label: "Home" },
+	{ href: "/services", label: "Browse services" },
+];
+
 export default function Navbar() {
+	const pathname = usePathname();
 	const router = useRouter();
 	const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -27,12 +33,30 @@ export default function Navbar() {
 		router.push("/");
 	};
 
+	const isActive = (href: string) =>
+		href === "/" ? pathname === "/" : pathname.startsWith(href);
+
 	return (
-		<header className="border-b border-ink/10 bg-paper">
-			<nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+		<header className="sticky top-0 z-40 border-b border-ink/10 bg-paper/95 backdrop-blur">
+			<nav className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-3">
 				<Logo className="flex items-center gap-2" />
 
-				{/* Desktop auth section — swap in your existing nav links here */}
+				{/* Primary nav links — desktop */}
+				<div className="hidden flex-1 items-center gap-6 md:flex">
+					{NAV_LINKS.map((link) => (
+						<Link
+							key={link.href}
+							href={link.href}
+							className={`text-sm font-medium transition-colors hover:text-primary ${
+								isActive(link.href) ? "text-primary" : "text-ink/70"
+							}`}
+						>
+							{link.label}
+						</Link>
+					))}
+				</div>
+
+				{/* Auth section — desktop */}
 				<div className="hidden items-center gap-4 md:flex">
 					{isHydrating ?
 						// Skeleton to avoid a flash of logged-out UI while
@@ -70,17 +94,38 @@ export default function Navbar() {
 					}
 				</div>
 
-				{/* Mobile menu toggle — keep your existing button, just make
-            sure aria-expanded/aria-controls still point at the panel */}
+				{/* Mobile menu toggle */}
 				<button
 					type="button"
 					aria-expanded={mobileOpen}
 					aria-controls="mobile-menu"
 					aria-label="Toggle menu"
 					onClick={() => setMobileOpen((v) => !v)}
-					className="md:hidden"
+					className="flex h-9 w-9 items-center justify-center rounded-md text-ink hover:bg-surface md:hidden"
 				>
-					{/* your existing hamburger icon */}
+					<svg
+						width="22"
+						height="22"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						aria-hidden="true"
+					>
+						{mobileOpen ?
+							<>
+								<line x1="18" y1="6" x2="6" y2="18" />
+								<line x1="6" y1="6" x2="18" y2="18" />
+							</>
+						:	<>
+								<line x1="3" y1="6" x2="21" y2="6" />
+								<line x1="3" y1="12" x2="21" y2="12" />
+								<line x1="3" y1="18" x2="21" y2="18" />
+							</>
+						}
+					</svg>
 				</button>
 			</nav>
 
@@ -88,39 +133,54 @@ export default function Navbar() {
 			{mobileOpen && (
 				<div id="mobile-menu" className="ticket-divider border-t md:hidden">
 					<div className="flex flex-col gap-3 px-4 py-4">
-						{isAuthenticated && user ?
-							<>
-								<Link
-									href={DASHBOARD_PATH[user.role] ?? "/"}
-									onClick={() => setMobileOpen(false)}
-									className="text-sm font-medium text-ink"
-								>
-									{user.name.split(" ")[0]}&apos;s Dashboard
-								</Link>
-								<button
-									onClick={handleLogout}
-									className="text-left text-sm font-medium text-ink"
-								>
-									Log out
-								</button>
-							</>
-						:	<>
-								<Link
-									href="/auth/login"
-									onClick={() => setMobileOpen(false)}
-									className="text-sm font-medium text-ink"
-								>
-									Log in
-								</Link>
-								<Link
-									href="/auth/register"
-									onClick={() => setMobileOpen(false)}
-									className="text-sm font-medium text-ink"
-								>
-									Register
-								</Link>
-							</>
-						}
+						{NAV_LINKS.map((link) => (
+							<Link
+								key={link.href}
+								href={link.href}
+								onClick={() => setMobileOpen(false)}
+								className={`text-sm font-medium ${
+									isActive(link.href) ? "text-primary" : "text-ink"
+								}`}
+							>
+								{link.label}
+							</Link>
+						))}
+
+						<div className="ticket-divider pt-3">
+							{isAuthenticated && user ?
+								<div className="flex flex-col gap-3 pt-3">
+									<Link
+										href={DASHBOARD_PATH[user.role] ?? "/"}
+										onClick={() => setMobileOpen(false)}
+										className="text-sm font-medium text-ink"
+									>
+										{user.name.split(" ")[0]}&apos;s Dashboard
+									</Link>
+									<button
+										onClick={handleLogout}
+										className="text-left text-sm font-medium text-ink"
+									>
+										Log out
+									</button>
+								</div>
+							:	<div className="flex flex-col gap-3 pt-3">
+									<Link
+										href="/auth/login"
+										onClick={() => setMobileOpen(false)}
+										className="text-sm font-medium text-ink"
+									>
+										Log in
+									</Link>
+									<Link
+										href="/auth/register"
+										onClick={() => setMobileOpen(false)}
+										className="text-sm font-medium text-ink"
+									>
+										Register
+									</Link>
+								</div>
+							}
+						</div>
 					</div>
 				</div>
 			)}
